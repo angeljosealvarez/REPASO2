@@ -1,0 +1,434 @@
+	#ORDERNAR LOS PRODUCTOS DE MAYOR A MENOR O INVERSA
+SELECT * FROM Products
+ORDER BY ProductName ASC NULLS LAST o FIRST (Admite tanto ASC como DESC)
+
+ORDER BY RANDOM()
+
+#CAMBIAR NOMBRE DE LOS PRODUCTOS
+SELECT ProductName as Producto 
+"También se puede hacer:" SELECT ProductName as Producto, Sells as Ventas etc.
+
+#SELECCIONAR LOS VALORES ÚNICOS (NO REPETIDOS) DE UN CAMPO
+SELECT DISTINCT ProductName FROM Products
+
+#ELIMINAR TODA LA BASE DE DATOS (NO HACERLO)
+DELETE FROM Products
+
+#CONDICIONAL WHERE
+SELECT ProductName FROM Products
+WHERE ProductID = 14
+"Seleccioname el campo productname de productos donde el id del producto es 14"
+
+#CLAUSULA UPDATE
+UPDATE turnos_medicos 
+SET HORARIO = "10:30",
+motivo = "Dolor de muela"
+WHERE id_usuario = 2
+"Set acepta varias columnas"
+
+#CONDICIONAL AND Y OR
+SELECT * FROM TABLA1
+WHERE USUARIO = "USUARIO1" AND PEDIDO = "Macarrones"
+--OR
+SELECT * FROM TABLA1
+WHERE USUARIO = "USUARIO1" OR PEDIDO = "Macarrones"
+
+#CONDICIONALES MIXTAS
+SELECT * FROM TABLA1
+WHERE (USUARIO = 'NOMBRENUEVO' OR PEDIDO = 'PEDIDO3') AND USUARIO = 'USUARIO3';
+
+#NEGACIONES
+SELECT * FROM TABLA1
+WHERE NOT ID = 3
+#NEGACIONES EN NORTHWIND
+SELECT * FROM Customers
+WHERE NOT Country = "USA" AND NOT Country = "France"
+
+SELECT * FROM Customers
+WHERE CustomerID  >=50 AND CustomerID <55 AND NOT Country = 'Germany';
+
+SELECT * FROM Customers
+WHERE CustomerID  >=50 AND NOT Country = 'Germany' AND NOT Country = 'UK'  LIMIT 5
+
+
+
+
+
+
+
+#OPERADOR DISTINCT (!=) (NO ES LO MISMO QUE NOT)
+2:40:00 VIDEO:https://www.youtube.com/watch?v=DFg1V-rO6Pg&t=9526s
+
+#BETWEEN
+EL PRIMER VALOR DE BETWEEN TIENE QUE SER EL MAYOR Y EL SEGUNDO EL MENOR
+SELECT * FROM Products WHERE Price BETWEEN 20 AND 40
+TAMBIÉN SE PUEDE SELECT * FROM Products WHERE Price BETWEEN 20 AND 40 AND CategoryID = 6 
+DONDE BETWEEN Y EL SEGUNDO AND SON INDEPENDIENTES (AL IGUAL QUE CON OR Y NOT)
+SELECT * FROM Employees WHERE BirthDate BETWEEN '1960-0-1' AND '1970-0-1'
+
+#OPERADOR LIKE
+
+LIKE PERMITE EL USO DE % Y ___ EN LOS VALORES QUE NOSOTORS INDIQUEMOS, = NO
+0 = FALSE
+1 = TRUE
+
+FUNCIÓN PARECIDA A =
+SELECT * FROM Employees WHERE FirstName LIKE 'Robert'
+% = PUEDE HABER OTROS VALORES ANTES QUE LOS INDICADOS EN EL CÓDGIO
+SELECT * FROM Employees WHERE FirstName LIKE '%obert (también funciona con adelantación)'
+
+F____R = QUEREMOS ENCONTRAR UNA CADENA DE DATOS QUE EMPIEZE POR LA LETRA F Y TERMINE POR LA R Y EN EL MEDIO HAYAN OTROS 4 CARÁCTERES
+también se puede hacer Full__   y _u____ y _u__%
+
+"""CASI TODAS LAS FUNCIONES DEL VIDEO EN ESTE CÓDIGO"""
+
+UPDATE Products
+SET ProductName = "Almejas"
+WHERE NOT ProductID LIKE 1 OR CategoryID = 2;
+SELECT * FROM PRODUCTS
+ORDER BY ProductName ASC NULLS LAST
+
+#OPERADOR IS NULL OR IS NOT NULL
+
+DEVUELVE VALORES NULOS Y LOS QUE NO SON NULOS
+
+SELECT * FROM Products 
+WHERE ProductName IS NOT NULL
+ORDER BY ProductName ASC
+
+#OPERADOR IN
+
+SELECT * FROM Products
+WHERE SupplierID IN (3,4,5,6)
+
+SELECT * FROM Employees
+WHERE LastName IN ('Fuller', 'King')
+
+SELECT * FROM Employees
+WHERE LastName NOT IN ('Fuller', 'King')
+
+#FUNCIONES DE AGREGACIÓN (SUBCONSULTAS)
+
+nos permiten agrupar datos, resumirlos o trabajar con estadísticas de los datos
+
+EN SELECT LO QUE HACEMOS ES SELECCIONAR CAMPOS
+
+SELECT count(FirstName) FROM Employees
+SELECT SUM(Price) FROM Products
+SELECT AVG(Price) FROM Products
+SELECT ROUND(AVG(Price)) FROM Products
+ROUND ACEPTA DOS VALORES: EL NÚMERO QUE QUEREMOS REDONDEAR, Y LA CANTIDAD DE DECIMALES QUE QUEREMOS QUE TENGA
+
+SELECT MIN(Price) AS promedio FROM Products
+
+SELECT ProductName, MIN(Price) AS promedio FROM Products
+WHERE ProductName IS NOT NULL
+
+SELECT ProductName, MAX(Price) AS promedio FROM Products
+WHERE ProductName IS NOT NULL
+
+#GROUP BY Y HAVING
+GROUP BY: AGRUPAR UNO O VARIOS REGISTROS EN UNO O VARIOS VALORES DE LA COLUMNA
+
+SELECT SupplierID, ROUND(AVG(Price)) FROM Products 
+GROUP BY SupplierID
+
+SELECT SupplierID, ROUND(AVG(Price)) AS promedio  FROM Products 
+GROUP BY SupplierID
+ORDER BY promedio DESC
+
+EN LOS GROUP INTENTAMOS EVITAR LA CLAUSULA WHERE YA QUE ESTA FILTRA REGISTROS Y HAVING FILTRA GRUPOS, QUE ES LA QUE SE USA
+
+SELECT SupplierID, ROUND(AVG(Price)) AS promedio FROM Products
+WHERE SupplierID IS NOT NULL
+GROUP BY SupplierID
+HAVING promedio > 40
+
+SELECT SupplierID, ROUND(AVG(Price)) AS promedio FROM Products
+WHERE ProductName IS NOT NULL
+GROUP BY SupplierID
+HAVING promedio > 40
+
+SELECT ProductID, SUM(Quantity) as total FROM OrderDetails
+GROUP BY ProductID
+HAVING total < 50
+ORDER BY total DESC
+LIMIT 1
+
+HAVING ES LO MISMO QUE WHERE PERO EN VEZ DE FILTRAR REGISTROS FILTRAN GRUPOS (CREO QUE GROUP BY TIENE COMO FUNCIÓN AGRUPAR CANTIDADES REPETIDAS EN UNA MISMA COLUMNA)
+
+UPDATE Products
+SET Price = 1000
+WHERE ProductName = "Tofu";
+
+SELECT SupplierID, ROUND(AVG(Price))FROM Products
+WHERE SupplierID LIKE "%6%" AND ProductName IS NOT NULL -- IN (2,3,4,5)
+GROUP BY SupplierID
+HAVING PRICE > 10
+LIMIT 10
+
+SELECT ProductID, SUM(Quantity) AS cantidad FROM OrderDetails
+GROUP BY ProductID
+HAVING cantidad > 50
+ORDER BY cantidad DESC
+LIMIT 1
+
+#SUBCONSULTAS
+ACCEDER A CONSULTAS DENTRO DE OTRAS CONSULTAS SIN PODER MODIFICAR LAS PRIMERAS
+
+
+--NO SE PUEDE HACER:
+SELECT ProductID,
+	Quantity,
+	(SELECT ProductName, OtraColumna FROM Products) FROM OrderDetails
+--NO SE PUEDE HACER YA QUE USAR OTRA COLUMNA HACE QUE SE TRANSFORME EN UNA TABLA, TENDRÍA QUE SER:
+
+SELECT ProductID,
+	Quantity,
+	(SELECT ProductName FROM Products), 
+    (SELECT OtraColumna  FROM Products), 
+    FROM OrderDetails
+
+SÍ SE PUEDE HACER
+SELECT ProductID,
+	Quantity,
+	(SELECT ProductName FROM Products WHERE OrderDetails.ProductID = ProductID) as nombre
+	FROM OrderDetails
+
+SELECT ProductID,
+    Quantity,
+	(SELECT ProductName FROM Products WHERE OD.ProductID = ProductID) as nombre,
+	(SELECT Price FROM Products WHERE OD.ProductID = ProductID) as precio
+	FROM [OrderDetails] AS OD
+
+
+SELECT ProductID, SUM(Quantity) as total_vendido, 
+		(SELECT Price FROM Products WHERE ProductID = OD.ProductID) as precio,
+		SUM(Quantity) * (SELECT Price FROM Products WHERE ProductID = OD.ProductID) as total_recaudado --NO SE PUEDE HACER REFERENCIA A UN ALIAS (total_vendido) EN UNA FUNCIÓN DE AGRUPACIÓN
+		FROM [OrderDetails] OD
+		
+GROUP BY ProductID
+ORDER BY total_recaudado DESC
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SELECT total_vendido FROM (
+
+SELECT ProductID, SUM(Quantity) as total_vendido, 
+		(SELECT Price FROM Products WHERE ProductID = OD.ProductID) as precio,
+		(SELECT ProductName FROM Products WHERE ProductID = OD.ProductID) as nombre,
+		SUM(Quantity) * (SELECT Price FROM Products WHERE ProductID = OD.ProductID) as total_recaudado
+		FROM [OrderDetails] OD
+WHERE precio > 40
+GROUP BY ProductID
+ORDER BY precio ASC) WHERE total_vendido > 100
+
+
+SELECT FirstName, LastName,
+(
+	SELECT SUM(od.Quantity) FROM [orders] o , [OrderDetails] od 
+	WHERE o.EmployeeID = e.EmployeeID AND o.orderID = od.OrderID  --ESE AND ES LA SOLUCIÓN DE PORQUE SE PONE FROM DE LA LÍNEA 3 CON DOS VALORES
+
+
+) as unidades_totales
+
+
+FROM [Employees] e
+WHERE suma > 40
+
+
+
+
+
+
+
+
+
+
+
+
+
+SELECT FirstName, LastName,
+(SELECT SUM(od.Quantity) FROM [orders] o, [OrderDetails] od
+WHERE o.EmployeeID = e.EmployeeID AND od.OrderID = o.OrderID) as unidades_totales
+FROM [Employees] e
+WHERE unidades_totales > (SELECT AVG(unidades_totales) FROM (
+
+SELECT (SELECT SUM(od.Quantity) FROM [orders] o, [OrderDetails] od
+WHERE o.EmployeeID = e2.EmployeeID AND od.OrderID = o.OrderID) unidades_totales FROM [Employees] e2
+GROUP BY e2.EmployeeID
+))
+
+
+#JOINS
+
+
+CROSS JOIN: (MULTIPLICAR LOS RESULTADOS DE DOS TABLAS) SELECT * FROM Employees e, Orders o
+TAMBIÉN SE PUEDE SELECT * FROM Employees e
+CROSS JOIN Orders o
+
+INNER JOIN
+
+SELECT * FROM Employees e, Orders O
+WHERE EmployeeID.e = EmployeeID.o
+
+SELECT * FROM Employees e
+INNER JOIN Orders o
+ON EmployeeID.e = EmployeeID.o (EL ON ES LA CONDICIÓN QUE PIDE EL INNER JOIN )
+
+SELECT LastName, FirstName, OrderID FROM Employees e
+INNER JOIN Orders o ON e.EmployeeID = o.EmployeeID
+
+
+#CREACIÓN DE TABLAS Y CAMPOS
+
+CREATE TABLE Rewards (
+
+"RewardID" INTEGER,
+"EmployeeID" INTEGER,
+"Reward" INTEGER,
+"Month" TEXT,
+
+PRIMARY KEY ("RewardID" AUTOINCREMENT)
+
+)
+-----------------------------------------------------------
+INSERT INTO Rewards (EmployeeID, Reward, Month) VALUES
+
+(3, 300, "January"),
+(2, 180, "February"),
+(5, 250, "March"),
+(1, 280, "April"),
+(8, 160, "May"),
+(NULL, NULL, "June")
+------------------------------------------------------------
+SELECT FirstName, Reward, Month FROM Employees e
+INNER JOIN Rewards r ON e.EmployeeID = r.EmployeeID
+------------------------------------------------------------
+Suceso de intersección
+SELECT FirstName, Reward, Month FROM Employees e
+LEFT JOIN Rewards r ON e.EmployeeID = r.EmployeeID (LEFT JOIN DEVUELVE LA TABLA A COMPLETA Y LA TABLA B CON LAS COINCIDENCIAS DE LA A Y LAS QUE NO COINCIDEN)
+------------------------------------------------------------
+FULL JOIN CON UNION Y UNION ALL
+
+UNION ALL DEVUELVE LA SUMA DE DOS UNIONS AUN TENIENDO VALORES REPETIDOS
+UNION DEVUELVE LA SUMA DE DOS UNIONS CON UN VALOR REPETIDO
+
+SELECT FirstName, Reward, Month FROM Employees e
+LEFT JOIN Rewards r ON e.EmployeeID = r.EmployeeID
+
+UNION 
+
+SELECT FirstName, Reward, Month FROM Rewards r
+LEFT JOIN Employees e ON e.EmployeeID = r.EmployeeID
+
+
+
+#CARDINALIDAD
+
+NOTACIÓN DE CHEN
+1:n (un valor puede representar muchos valores de otra tabla)
+usar verbos para entender las relaciones
+NOTACIÓN DE MARTIN
+
+#NORMALIZACIÓN DE BASES DE DATOS
+ELIMINAR ANOMALIAS, MÁS EFICIENTES Y EFECTIVAS LAS BASES DE DATOS (PARA ESO SIRVEN)
+5 NIVELES
+(1NF) Primera norma formal
+valores tienen que ir separados por distintas tablas, ejemplo (5:40:00 (minuto del video)) un valor nombre no puede ir en la misma tabla con el apellido, tienen que estar separados
+(2NF) Segunda norma formal
+Los valores tienen que depender siempre y unicamente de una clave primaria, no pueden depender por partes de distintas claves primarias, para cumplir esta norma se crea una tabla separada
+(3NF) Tercera norma formal
+Un atributo debe depender únicamente de una clave primaria, y no de otros atributos ni claves (dependencias transitivas(un atributo A que depende de un atributo B y este depende de la clave primaria)
+(4NF) Cuarta norma formal
+Se evita la redundancia de datos. Establece que cada tabla debe tener una clave primaria COMPUESTA que consta de múltiples columnas en lugar de una sola
+Dependencia multivalorada una tabla tiene multiples valores para una columna y esos valores estan relacionados con multiples valores de otras columnas
+(5NF) Quinta norma formal
+Se asegura de que no haya dependencias de unión los atributos (ejemplo: si un atributo depende de que se unan atributos de varias tablas entonces el atributo principal tiene que ser 
+movido a otra tabla)
+
+En resumen: 
+identificamos claves primarias
+revisamos que los atributos tienen una sola clave primaria
+revisamos que los atributos no dependan de otras claves o valores (dependencias transitivas)
+revisamos que para cada clave primaria haya más de un valor
+revisamos que para cada valor este no dependa de otros en la misma tabla, en caso contrario, se desplazará a otra tabla
+
+#ÍNDICES 
+
+los foreign keys son los codigos que permiten crear indices en un lenguaje de programacion
+no se crean muchos indices ya que ocupan mucho espacio, hay que actualizar todo al llamar los datos (reduce el rendimiento) y el mantenimiento (son mas complejas)
+los índices sirven para recorrer los valores hasta llegar al valor que se pide, no como sin indices, en los cuales se recorren todos los valores Y LUEGO se buscan los valores
+
+LOS INDICES SIRVEN PARA AHORRAR TIEMPO Y RENDIMIENTO A LA HORA DE EJECUTAR EL CÓDIGO (EJEMPLO: EN VEZ DE RECORRER TODOS LOS DATOS DE UNA TABLA SOLAMENTE SE RECORREN LOS DATOS DE LA TABLA QUE 
+ESTÁN INDEXADAS
+
+Dos personas que modifican datos a la vez en una misma tabla y no se sabe bien que valores añadir a la tabla final
+
+CREATE UNIQUE INDEX name ON Employees (FirstName) (CREA UN CAMPO ÚNICO PARA CADA VALOR Y NO CUENTA LOS REPETIDOS, es decir, si hay dos anas no cuenta a ninguna ana y sigue creando index )
+CREATE INDEX name ON Employees (FirstName)
+
+si usamos una columna en clausulas where, join y demás es mejor usar indices
+
+ELIMINAR INDEX
+DROP INDEX idx_orderDetails_quantity;
+DROP INDEX idx_orders_orderDate 
+
+#VISTAS
+Son tablas virtuales (son como un SELECT () FROM X)
+actúan también como variables
+
+CREATE VIEW Productos_Simplificados AS
+
+SELECT ProductID, ProductName, Price FROM Products
+WHERE ProductID > 20
+ORDER BY ProductID DESC
+
+
+SELECT * FROM Productos_Simplificados
+
+TIENEN PRIORIDADES LAS VISTAS ANTES QUE LAS TABLAS A LA HORA DE LLAMARLAS
+PARA ELIMINAR UNA VISTA
+
+DROP VIEW IF EXISTS Productos_Simplificados -- CUANDO IF EXISTS ES OPCIONAL
+
+#BLOQUEOS Y TRANSACCIONES
+
+SQLite TIENE BLOQUE COMPLETO (CUANDO UNA CONDICIÓN SE COMPLETA EN UNA BASE DE DATOS, LA OTRA CONDICIÓN SE BLOQUEA PARA IMPEDIR LA EXISTENCIA DE ERRORES)
+
+SHARED LOCKS NADIE PUEDE ESCRIBIR PERO PUEDEN LEER
+RESERVED LOCKS CUANDO ALGUIEN MÁS QUIERE LEER O ESCRIBIR (SE APLICA AL ESCRIBIR NO AL LEER) ESTAMOS ESCRIBIENDO
+EXCLUSIVE BLOCKS QUE LA PERSONA NO PUEDE NI LEER NI ESCRIBIR  ESTAMOS ESCRIBIENDO
+
+LAS TRANSACCIONES TIENEN COMO FINALIDAD SU USO PARA QUE EL PROGRAMADOR EXPERIMENTE 
+
+BEGIN TRANSACTION;
+
+UPDATE Products SET ProductName = "pezon" WHERE ProductName = "Chais";
+
+COMMIT
+
+COMMIT SE ENCARGA DE ASENTAR (GUARDA LA INFORMACIÓN EN EL DISCO) EL CAMBIO ROLLBACK NO
+ROLLBACK SIRVE PARA VOLVER HACIA ATRAS
+
+#PROCEDIMIENOTS ALMACENADOS
+CONJUNTO DE INSTRUCCIONES O COMANDOS QUE SE GUARDAN EN LA BASE DE DATOS Y SE PUEDEN EJECUTAR EN CUALQUIER MOMENTO
+
+#USER DEFINED FUNCTIONS

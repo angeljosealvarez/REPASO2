@@ -1,0 +1,10 @@
+setup.py
+CALCULOS/Modulos.py
+CALCULOS/Uso_Modulos.py
+CALCULOS/__init__.py
+CALCULOS/POTENCIA_REDONDEO/__init__.py
+CALCULOS/POTENCIA_REDONDEO/potencia_redondeo.py
+paqueteC_lculos.egg-info/PKG-INFO
+paqueteC_lculos.egg-info/SOURCES.txt
+paqueteC_lculos.egg-info/dependency_links.txt
+paqueteC_lculos.egg-info/top_level.txt
